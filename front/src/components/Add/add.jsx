@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import './add.css';
-import axios from 'axios';
-import Helmet from 'react-helmet';
+import React, { useEffect, useState } from "react";
+import "./add.css";
+import axios from "axios";
+import Helmet from "react-helmet";
 
 export default function Add() {
-  const [eventName, setEventName] = useState('');
-  const [eventData, setEventData] = useState('');
+  const [eventName, setEventName] = useState("");
+  const [eventData, setEventData] = useState("");
   const [events, setEvents] = useState([]);
   const [selectedEvents, setSelectedEvents] = useState([]);
 
-
+  // Fetch events from the server
   const fetchtodo = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/eventdata");
@@ -19,11 +19,14 @@ export default function Add() {
     }
   };
 
- 
+  // Add a new event
   const addtodo = async () => {
     try {
-      const response = await axios.post("http://localhost:5000/api/eventdata", { eventName, eventData });
-      setEvents([...events, response.data]); 
+      await axios.post("http://localhost:5000/api/eventdata", {
+        eventName,
+        eventData,
+      });
+      await fetchtodo(); // Fetch the latest data after adding a new event
       console.log("Event added");
     } catch {
       console.log("Error adding event");
@@ -33,9 +36,11 @@ export default function Add() {
   // Delete selected events
   const deletetodo = async () => {
     try {
-      await axios.post("http://localhost:5000/api/eventdata/delete", { ids: selectedEvents });
-      // Remove deleted events from the state
-      setEvents(events.filter(event => !selectedEvents.includes(event._id)));
+      await axios.post("http://localhost:5000/api/eventdata/delete", {
+        ids: selectedEvents,
+      });
+      // Fetch updated list after deletion
+      await fetchtodo();
       setSelectedEvents([]); // Clear the selection
       console.log("Selected events deleted");
     } catch {
@@ -43,7 +48,7 @@ export default function Add() {
     }
   };
 
-
+  // Handle form submission
   const handleEvent = async (e) => {
     e.preventDefault();
     if (!eventName || !eventData) {
@@ -52,20 +57,15 @@ export default function Add() {
     }
     try {
       await addtodo();
-      setEventName('');
-      setEventData('');
-      console.log('Event submitted:', { eventName, eventData });
+      setEventName("");
+      setEventData("");
+      console.log("Event submitted:", { eventName, eventData });
     } catch {
-      console.log('Error submitting event');
+      console.log("Error submitting event");
     }
   };
 
-
-  useEffect(() => {
-    fetchtodo();
-  }, []);
-
- 
+  // Toggle event selection for deletion
   const toggleEventSelection = (eventId) => {
     setSelectedEvents((prevSelected) =>
       prevSelected.includes(eventId)
@@ -74,14 +74,22 @@ export default function Add() {
     );
   };
 
+  useEffect(() => {
+    fetchtodo();
+  }, []);
+
   return (
     <div className="add-container">
-      <Helmet><title>Todo</title></Helmet>
+      <Helmet>
+        <title>Todo</title>
+      </Helmet>
       <h1 className="title">T O D O</h1>
       <div className="form-container">
         <form onSubmit={handleEvent} className="form">
           <h2>Add Event</h2>
-          <label htmlFor="event-name" style={{ textAlign: 'left' }}>Title:</label>
+          <label htmlFor="event-name" style={{ textAlign: "left" }}>
+            Title:
+          </label>
           <input
             type="text"
             id="event-name"
@@ -89,7 +97,9 @@ export default function Add() {
             onChange={(e) => setEventName(e.target.value)}
             placeholder="Enter event name"
           />
-          <label htmlFor="event-data" style={{ textAlign: 'left' }}>Data:</label>
+          <label htmlFor="event-data" style={{ textAlign: "left" }}>
+            Data:
+          </label>
           <textarea
             id="event-data"
             value={eventData}
