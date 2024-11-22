@@ -30,10 +30,10 @@ export default function Add() {
     }
   };
 
-  // Delete selected events
+
   const deletetodo = async () => {
     try {
-      await axios.post("http://localhost:5000/api/eventdata/delete", { ids: selectedEvents });
+      await axios.post("http://localhost:5000/api/eventdata/delete/:id", { ids: selectedEvents });
       // Remove deleted events from the state
       setEvents(events.filter(event => !selectedEvents.includes(event._id)));
       setSelectedEvents([]); // Clear the selection

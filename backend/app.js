@@ -50,12 +50,13 @@ app.post("/api/eventdata", async (req, res) => {
     }
   });
   
-  app.post('/api/eventdata/delete', async (req, res) => {
+  app.post('/api/eventdata/delete/:id', async (req, res) => {
     const { ids } = req.body;
     try {
-      await EventModel.deleteMany({ _id: { $in: ids } });
+      await Todo.deleteMany({ _id: { $in: ids } });
     } catch (error) {
      console.log("error del")
+     console.log(ids)
     }
   });
   
